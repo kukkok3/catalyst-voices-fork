@@ -21,7 +21,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Setup allure results folder
+      - name: Setup Allure results folder
         run:
           mkdir allure-results
           mv cat-gateway.junit-report.xml allure-results
@@ -35,7 +35,7 @@ jobs:
           ref: gh-pages
           path: gh-pages-dir
 
-      - name: Allure Report Action
+      - name: Build Allure report
         uses: mgrybyk/allure-report-branch-action@v1
         if: always()
         continue-on-error: true
@@ -45,7 +45,7 @@ jobs:
           gh_pages: 'gh-pages-dir'
           report_dir: 'allure-results'
 
-      - name: Git Commit and Push Action
+      - name: Git push to gh-pages
         uses: mgrybyk/git-commit-pull-push-action@v1
         if: always()
         with:
@@ -53,7 +53,7 @@ jobs:
           branch: gh-pages
           pull_args: --rebase -X ours
 
-      - name: Comment PR with Allure Report link
+      - name: Comment PR with Allure report link
         if: ${{ always() && github.event_name == 'pull_request' && steps.allure.outputs.report_url }}
         continue-on-error: true
         uses: thollander/actions-comment-pull-request@v2
