@@ -22,7 +22,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Setup Allure results folder
-        run:
+        run: |
           mkdir allure-results
           mv cat-gateway.junit-report.xml allure-results
           mv junit-report.xml allure-results
