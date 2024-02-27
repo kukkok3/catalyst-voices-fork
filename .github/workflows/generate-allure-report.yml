@@ -20,7 +20,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-#lsl
+
       - name: Setup Allure results folder
         run: |
           mkdir allure-results
@@ -59,6 +59,6 @@ jobs:
         uses: thollander/actions-comment-pull-request@v2
         with:
           message: |
-            ${{ steps.allure.outputs.test_result_icon }} [Test Report](${{ steps.allure.outputs.report_url }}) | ${\color{green}Pass: ${{ steps.allure.outputs.test_result_passed }}}$ | ${\color{red}Fail: ${{ steps.allure.outputs.test_result_failed }}}$ | ${\color{white}Tot: ${{ steps.allure.outputs.test_result_total }}}$ | [History](${{ steps.allure.outputs.report_history_url }})
+            ${{ steps.allure.outputs.test_result_icon }} [Test Report](${{ steps.allure.outputs.report_url }}) | ${\color{lightgreen}Pass: ${{ steps.allure.outputs.test_result_passed }}}$ | ${\color{red}Fail: ${{ steps.allure.outputs.test_result_failed }}}$ | ${\color{white}Tot: ${{ steps.allure.outputs.test_result_total }}}$ | [History](${{ steps.allure.outputs.report_history_url }})
           comment_tag: allure_report
           mode: upsert
