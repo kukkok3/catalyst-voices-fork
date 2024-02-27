@@ -10,7 +10,7 @@ permissions:
     pull-requests: write
 
 concurrency:
-    group: ${{ github.workflow }}-${{ github.ref }}
+    group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
     cancel-in-progress: true
 
 jobs:
@@ -60,5 +60,5 @@ jobs:
         with:
           message: |
             ${{ steps.allure.outputs.test_result_icon }} [Test Report](${{ steps.allure.outputs.report_url }}) | ${\color{green}Pass: ${{ steps.allure.outputs.test_result_passed }}}$ | ${\color{red}Fail: ${{ steps.allure.outputs.test_result_failed }}}$ | ${\color{white}Tot: ${{ steps.allure.outputs.test_result_total }}}$ | [History](${{ steps.allure.outputs.report_history_url }})
-          comment_tag: allure_allure
-          mode: recreate
+          comment_tag: allure_report
+          mode: upsert
