@@ -27,6 +27,7 @@ jobs:
           mv cat-gateway.junit-report.xml allure-results
           mv junit-report.xml allure-results
 
+
       - name: Checkout gh-pages
         uses: actions/checkout@v3
         if: always()
