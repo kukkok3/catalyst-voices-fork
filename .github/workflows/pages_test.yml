@@ -1,4 +1,4 @@
-name: Allure Report
+name: Pages
 
 on:
   pull_request:
@@ -21,13 +21,15 @@ jobs:
         uses: actions/checkout@v3
       - name: Set env
         run: |
-          CLEAN_EXCLUDE="/branch/*\n/allure-action/*"
-          echo "CLEAN_EXCLUDE=$CLEAN_EXCLUDE" >> $GITHUB_ENV
+          echo 'CLEAN_EXCLUDE<<EOF'
+          echo "/branch/*"
+          echo "/allure-action/*"
+          echo EOF >> $GITHUB_ENV
       - name: Publish docs
         uses: JamesIves/github-pages-deploy-action@v4.4.3
         with:
           clean: true
           clean-exclude: |
-            "${{ env.CLEAN_EXCLUDE }}"
+            ${{ env.CLEAN_EXCLUDE }}
           single-commit: true
           folder: .
