@@ -1,0 +1,33 @@
+name: Allure Report
+
+on:
+  pull_request:
+  push:
+    branches: 'main'
+
+permissions:
+    contents: write
+    pull-requests: write
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+    cancel-in-progress: true
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set env
+        run: |
+          CLEAN_EXCLUDE="/branch/*\n/allure-action/*"
+          echo "CLEAN_EXCLUDE=$CLEAN_EXCLUDE" >> $GITHUB_ENV
+      - name: Publish docs
+        uses: JamesIves/github-pages-deploy-action@v4.4.3
+        with:
+          clean: true
+          clean-exclude: |
+            "${{ env.CLEAN_EXCLUDE }}"
+          single-commit: true
+          folder: .
