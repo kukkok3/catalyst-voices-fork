@@ -1,0 +1,56 @@
+VERSION 0.7
+
+package-schemathesis:
+    FROM python:3.12-alpine3.19
+    ARG tag="latest"
+    ARG max_examples=1000
+    ARG max_response_time=200
+    ARG wait_for_schema=15
+    ARG workers=1
+    ARG schema_version=30
+    ARG openapi_spec
+    RUN apk add --no-cache gcc musl-dev
+    RUN python -m pip install schemathesis
+    RUN mkdir /results
+    VOLUME /results
+    ENTRYPOINT st run --checks all $openapi_spec --data-generation-method all --workers=$workers --wait-for-schema=$wait_for_schema \
+                        --max-response-time=$max_response_time --hypothesis-max-examples=$max_examples \
+                                --force-color --skip-deprecated-operations --show-trace \
+                                 --force-schema-version=$schema_version --junit-xml /results/junit-report.xml
+    SAVE IMAGE schemathesis:$tag
+
+# test-fuzzer-api - Fuzzy test cat-gateway using openapi specs
+test-fuzzer-api:
+    FROM earthly/dind:alpine-3.19
+    RUN apk update && apk add iptables-legacy # workaround for https://github.com/earthly/earthly/issues/3784
+    COPY schemathesis-docker-compose.yml .
+    WITH DOCKER \
+        --compose schemathesis-docker-compose.yml \
+        --load schemathesis:latest=(+package-schemathesis --openapi_spec="http://127.0.0.1:3030/docs/cat-gateway.json") \
+        --load event-db:latest=(../event-db+build --with_historic_data=false) \
+        --load cat-gateway:latest=(../+package-cat-gateway --address="127.0.0.1:3030" \
+                                        --db_url="postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev") \
+        --service event-db \
+        --service cat-gateway \
+        --allow-privileged
+        RUN docker run --net=host --name=st schemathesis:latest || echo fail > fail && \
+                docker logs cat-gateway > ./cat-gateway.log && \
+                    docker cp st:/results/junit-report.xml junit-report.xml
+    END
+    WAIT
+        SAVE ARTIFACT junit-report.xml AS LOCAL junit-report.xml
+        SAVE ARTIFACT cat-gateway.log AS LOCAL cat-gateway.log
+    END
+    IF [ -f fail ]
+        RUN echo "Schemathesis run failed" && \
+            exit 1
+    END
+
+# test-lint-openapi - OpenAPI linting from an artifact
+# testing whether the OpenAPI generated during build stage follows good practice.
+test-lint-openapi:
+    FROM github.com/input-output-hk/catalyst-ci/earthly/spectral:v2.4.0+spectral-base
+    # Copy the doc artifact.
+    COPY ../+build/doc ./doc
+    # Scan the doc directory where type of file is JSON.
+    DO github.com/input-output-hk/catalyst-ci/earthly/spectral:v2.4.0+BUILD_SPECTRAL --dir=./doc --file_type="json"
