@@ -21,14 +21,21 @@ jobs:
         uses: actions/checkout@v3
       - name: Set env
         run: |
-            CLEAN_EXCLUDE="/nothing"
+          GIT_BRANCH="TEST"
+          if [[ $GIT_BRANCH == "TEST" ]]; then
+            DEST_DIR="/"
             {
-              echo 'CLEAN_EXCLUDE<<EOF'
-              echo /branch/*
-              echo /allure-action/*
-              echo EOF
-            } >> "$CLEAN_EXCLUDE"
-            echo "CLEAN_EXCLUDE=$CLEAN_EXCLUDE" >> $GITHUB_ENV
+            echo 'CLEAN_EXCLUDE<<EOF'
+            echo "/branch/*"
+            echo "/allure-action/*"
+            echo EOF
+            } >> "$GITHUB_ENV"
+          else
+            DEST_DIR="/branch/${GIT_BRANCH//[^a-zA-Z0-9_]/_}"
+            echo "CLEAN_EXCLUDE="/nothing"" >> $GITHUB_ENV
+          fi
+          echo "GIT_BRANCH=$GIT_BRANCH" >> $GITHUB_ENV
+          echo "DEST_DIR=$DEST_DIR" >> $GITHUB_ENV
       - name: Publish docs
         uses: JamesIves/github-pages-deploy-action@v4.4.3
         with:
