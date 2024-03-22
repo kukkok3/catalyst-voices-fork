@@ -22,9 +22,9 @@ jobs:
       - name: Set env
         run: |
           echo 'CLEAN_EXCLUDE<<EOF'
-          echo "/branch/*"
-          echo "/allure-action/*"
-          echo EOF >> $GITHUB_ENV
+          echo /branch/*
+          echo /allure-action/*
+          echo EOF >> "$GITHUB_ENV"
       - name: Publish docs
         uses: JamesIves/github-pages-deploy-action@v4.4.3
         with:
