@@ -24,7 +24,7 @@ jobs:
           {
             echo 'CLEAN_EXCLUDE<<EOF'
             echo "/branch/*"
-            echo "/allure-action/*
+            echo "/allure-action/*"
             echo EOF
           } >> "$GITHUB_ENV"
       - name: Publish docs
