@@ -22,7 +22,7 @@ jobs:
       - name: Set env
         run: |
           GIT_BRANCH="TEST"
-          if [[ $GIT_BRANCH == "TEST" ]]; then
+          if [[ $GIT_BRANCH == "ST" ]]; then
             DEST_DIR="/"
             {
             echo 'CLEAN_EXCLUDE<<EOF'
