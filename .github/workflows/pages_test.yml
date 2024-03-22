@@ -21,7 +21,7 @@ jobs:
         uses: actions/checkout@v3
       - name: Set env
         run: |
-          GIT_BRANCH="TEST"
+          GIT_BRANCH="/-TEST"
           if [[ $GIT_BRANCH == "/ST-" ]]; then
             DEST_DIR="/"
             {
